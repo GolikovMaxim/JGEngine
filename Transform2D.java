@@ -6,24 +6,24 @@ public class Transform2D extends Component {
     public Vector2D scale;
     public float zFactor = 0;
 
-    public Transform2D() {
+    Transform2D() {
         position = new Vector2D();
         rotation = 0;
         scale = new Vector2D(1, 1);
     }
 
-    public Transform2D(Vector2D pos) {
+    Transform2D(Vector2D pos) {
         this();
         position = pos;
     }
 
-    public Transform2D(Vector2D pos, float rot) {
+    Transform2D(Vector2D pos, float rot) {
         this();
         position = pos;
         rotation = rot;
     }
 
-    public Transform2D(Vector2D pos, float rot, Vector2D scl) {
+    Transform2D(Vector2D pos, float rot, Vector2D scl) {
         this();
         position = pos;
         rotation = rot;
