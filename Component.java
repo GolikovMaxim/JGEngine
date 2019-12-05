@@ -2,6 +2,7 @@ package JGEngine;
 
 public class Component {
     GameObject gameObject;
+    boolean isStarted = false;
 
     public void onStart() {
 

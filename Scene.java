@@ -43,8 +43,8 @@ public class Scene {
 
     private GameObject createGameObjectByNodes(NodeList nodes, String name)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        GameObject.gameObjects = gameObjects;
         GameObject gameObject = GameObject.gameObject2D(name);
-        gameObjects.add(gameObject);
         for(int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
             if(node.getNodeName().equals(COMPONENT_NODE_NAME)) {

@@ -70,6 +70,10 @@ public class Vector2D {
         return Vector2D.div(this, length());
     }
 
+    public Vector2D round() {
+        return new Vector2D((int)x, (int)y);
+    }
+
     public float length() {
         return (float)Math.sqrt(x*x + y*y);
     }
@@ -77,6 +81,14 @@ public class Vector2D {
     @Override
     public String toString() {
         return "X: " + x + " Y: " + y;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if(obj.getClass().equals(getClass())) {
+            return x == ((Vector2D)obj).x && y == ((Vector2D)obj).y;
+        }
+        return false;
     }
 
     public static Vector2D add(Vector2D vec1, Vector2D vec2) {

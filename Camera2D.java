@@ -29,17 +29,29 @@ public class Camera2D extends Component {
     }
 
     public boolean isVisible(GameObject gameObject) {
+        if(gameObject.getComponent(UITransform2D.class) != null) {
+            return true;
+        }
         Rect2D camRect = new Rect2D(this);
         Rect2D objRect = new Rect2D(gameObject.getComponent(Transform2D.class));
         return Rect2D.isIntersected(camRect, objRect);
     }
 
     public Vector2D worldSpaceToScreen(GameObject gameObject) {
-        Vector2D globalPosition = gameObject.getComponent(Transform2D.class).getGlobalPosition();
+        Vector2D globalPosition, leftUpVert;
+        if(gameObject.getComponent(UITransform2D.class) != null) {
+            leftUpVert = Vector2D.sub(gameObject.getComponent(Transform2D.class).getGlobalPosition(),
+                    Vector2D.div(gameObject.getComponent(Transform2D.class).getGlobalScale(), 2));
+            return Vector2D.vector2Dmul(
+                    leftUpVert,
+                    RenderSystem.renderSystem.windowSize
+            );
+        }
+        globalPosition = gameObject.getComponent(Transform2D.class).getGlobalPosition();
         Rect2D cameraRect = new Rect2D(this);
         Rect2D notRotated = new Rect2D(cameraRect.position, cameraRect.size, 0);
         globalPosition.rotateAround(notRotated.position, -cameraRect.rotation);
-        Vector2D leftUpVert = notRotated.points[1];
+        leftUpVert = notRotated.points[1];
         return Vector2D.vector2Dmul(
                 Vector2D.vector2Ddiv(
                         Vector2D.sub(globalPosition, leftUpVert),

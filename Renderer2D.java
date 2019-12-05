@@ -15,7 +15,7 @@ public class Renderer2D extends Component {
     }
 
     public void setImage(Image renderLook) {
-        this.imageView = new ImageView(renderLook);
+        imageView.setImage(renderLook);
     }
 
     @Override

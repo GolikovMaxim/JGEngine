@@ -1,13 +1,20 @@
 package JGEngine;
 
+import javafx.application.Platform;
+import org.ietf.jgss.GSSManager;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class GameObject {
     static ArrayList<GameObject> gameObjects;
+    static ArrayList<GameObject> addedGameObjects = new ArrayList<>();
+    static ArrayList<GameObject> removedGameObjects = new ArrayList<>();
     static final GameObject worldCenter = gameObject2D("WorldCenter");
 
     HashMap<Class, Component> components = new HashMap<>();
+    HashMap<Class, Component> addedComponents = new HashMap<>();
     GameObject parent;
     ArrayList<GameObject> children = new ArrayList<>();
     public String name;
@@ -15,17 +22,20 @@ public class GameObject {
     GameObject(String name) {
         this.parent = worldCenter;
         this.name = name;
+        addedGameObjects.add(this);
     }
 
     public static GameObject gameObject2D(String name) {
         GameObject res = new GameObject(name);
         res.addComponent(new Transform2D());
+        res.processAddedComponents();
         return res;
     }
 
     public static GameObject gameObject2D(String name, Vector2D pos) {
         GameObject res = new GameObject(name);
         res.addComponent(new Transform2D(pos));
+        res.processAddedComponents();
         return res;
     }
 
@@ -49,25 +59,39 @@ public class GameObject {
     }
 
     public <T extends Component> T getComponent(Class<T> type) {
-        if(components.get(type) == null) {
+        if(components.get(type) == null && addedComponents.get(type) == null) {
             return null;
+        }
+        else if(components.get(type) == null) {
+            return (T)addedComponents.get(type);
         }
         return (T)components.get(type);
     }
 
     public <T extends Component> void addComponent(T component) {
         if(getComponent(component.getClass()) == null) {
-            components.put(component.getClass(), component);
+            addedComponents.put(component.getClass(), component);
             component.gameObject = this;
-            if(Engine.gameStarted) {
-                component.onStart();
-            }
+        }
+    }
+
+    public <T extends Component> void addComponent(Class<T> _class, T component) {
+        if(getComponent(_class) == null) {
+            addedComponents.put(_class, component);
+            component.gameObject = this;
         }
     }
 
     void addComponent(Object obj) {
         Component component = (Component)obj;
         addComponent(component);
+    }
+
+    void processAddedComponents() {
+        for(Map.Entry<Class, Component> entry : addedComponents.entrySet()) {
+            components.put(entry.getKey(), entry.getValue());
+        }
+        addedComponents.clear();
     }
 
     public <T extends Component> void removeComponent(Class<T> type) {
@@ -77,6 +101,10 @@ public class GameObject {
         components.remove(type);
     }
 
+    public void delete() {
+        removedGameObjects.add(this);
+    }
+
     public static GameObject findGameObject(String name) {
         for(GameObject gameObject : gameObjects) {
             if(gameObject.name.equals(name)) {
@@ -84,5 +112,25 @@ public class GameObject {
             }
         }
         return null;
+    }
+
+    static void processAddedGameObjects() {
+        for(GameObject gameObject : addedGameObjects) {
+            gameObjects.add(gameObject);
+        }
+        addedGameObjects.clear();
+    }
+
+    static void processRemovedGameObjects() {
+        for(GameObject gameObject : removedGameObjects) {
+            if(gameObject.components.containsKey(Renderer2D.class)) {
+                Platform.runLater(() ->
+                        RenderSystem.renderSystem.visibleObjects.getChildren().
+                                remove(gameObject.getComponent(Renderer2D.class).imageView)
+                );
+            }
+            gameObjects.remove(gameObject);
+        }
+        removedGameObjects.clear();
     }
 }

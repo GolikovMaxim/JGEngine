@@ -1,10 +1,12 @@
 package JGEngine;
 
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.image.ImageView;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,9 +14,10 @@ public class RenderSystem {
     public static final RenderSystem renderSystem = new RenderSystem();
 
     HashMap<GameObject, Boolean> renderGameObjects = new HashMap<>();
+    ArrayList<GameObject> uiGameObjects = new ArrayList<>();
     Vector2D windowSize = new Vector2D(640, 480);
     Group visibleObjects = new Group();
-    Scene scene = new Scene(visibleObjects, windowSize.x, windowSize.y, true, SceneAntialiasing.BALANCED);
+    Scene scene;
 
     private RenderSystem() {
 
@@ -26,7 +29,7 @@ public class RenderSystem {
         }
         synchronized (GameObject.gameObjects) {
             for(GameObject gameObject : GameObject.gameObjects) {
-                if(Camera2D.main.isVisible(gameObject)) {
+                if(Camera2D.main.isVisible(gameObject) && gameObject.getComponent(Renderer2D.class) != null) {
                     if(renderGameObjects.get(gameObject) != null && !renderGameObjects.get(gameObject)) {
                         visibleObjects.getChildren().add(gameObject.getComponent(Renderer2D.class).imageView);
                         for(Map.Entry<Class, Component> entry : gameObject.components.entrySet()) {
@@ -72,7 +75,17 @@ public class RenderSystem {
         return windowSize.y / windowSize.x;
     }
 
+    public void setWindowSize(Vector2D windowSize) {
+        Vector2D decorationSize = new Vector2D((float)(Main.stage.getWidth() - this.windowSize.x),
+                (float)(Main.stage.getHeight() - this.windowSize.y));
+        this.windowSize = windowSize;
+        Platform.runLater(() -> {
+            Main.stage.setWidth(windowSize.x + decorationSize.x);
+            Main.stage.setHeight(windowSize.y + decorationSize.y);
+        });
+    }
+
     public void setWindowTitle(String title) {
-        Main.stage.setTitle(title);
+        Platform.runLater(() -> Main.stage.setTitle(title));
     }
 }
