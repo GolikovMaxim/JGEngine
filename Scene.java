@@ -16,6 +16,8 @@ public class Scene {
     private static final String COMPONENT_NODE_NAME = "component";
 
     ArrayList<GameObject> gameObjects = new ArrayList<>();
+    ArrayList<GameObject> addedGameObjects = new ArrayList<>();
+    ArrayList<GameObject> removedGameObjects = new ArrayList<>();
     String name;
 
     Scene(File sceneFile) {
@@ -43,7 +45,12 @@ public class Scene {
 
     private GameObject createGameObjectByNodes(NodeList nodes, String name)
             throws ClassNotFoundException, IllegalAccessException, InstantiationException {
+        ArrayList<GameObject> prevGameObjects = GameObject.gameObjects;
+        ArrayList<GameObject> prevAddedGameObjects = GameObject.addedGameObjects;
+        ArrayList<GameObject> prevRemovedGameObjects = GameObject.removedGameObjects;
         GameObject.gameObjects = gameObjects;
+        GameObject.addedGameObjects = addedGameObjects;
+        GameObject.removedGameObjects = removedGameObjects;
         GameObject gameObject = GameObject.gameObject2D(name);
         for(int i = 0; i < nodes.getLength(); i++) {
             Node node = nodes.item(i);
@@ -56,6 +63,9 @@ public class Scene {
                         node.getAttributes().getNamedItem("name").getNodeValue()));
             }
         }
+        GameObject.gameObjects = prevGameObjects;
+        GameObject.gameObjects = prevAddedGameObjects;
+        GameObject.gameObjects = prevRemovedGameObjects;
         return gameObject;
     }
 }

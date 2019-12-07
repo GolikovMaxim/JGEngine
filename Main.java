@@ -17,15 +17,18 @@ public class Main extends Application {
         stage.addEventHandler(KeyEvent.ANY, event ->
                 Input.getInput().addKey(event.getCode(), !event.getEventType().equals(KeyEvent.KEY_RELEASED)));
         Engine.engine = new Engine();
+        Main.stage.setScene(RenderSystem.renderSystem.scene);
+        Main.stage.show();
+        Main.stage.setOnCloseRequest(event -> {
+            System.exit(0);
+        });
         Timer updater = new Timer();
-        updater.scheduleAtFixedRate(new TimerTask() {
+        updater.schedule(new TimerTask() {
             @Override
             public void run() {
                 Engine.engine.update();
             }
         }, 0, 17);
-        Main.stage.setScene(RenderSystem.renderSystem.scene);
-        Main.stage.show();
     }
 
 

@@ -1,5 +1,8 @@
 package JGEngine;
 
+import javafx.application.Platform;
+import javafx.scene.paint.Color;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FilenameFilter;
@@ -12,7 +15,7 @@ public class SceneManager {
     public static final SceneManager sceneManager = new SceneManager();
 
     File scenesList;
-    ArrayList<Scene> scenes = new ArrayList<>();
+    ArrayList<String> sceneFileNames = new ArrayList<>();
     ExtensionFilter extensionFilter = new ExtensionFilter(sceneExtension);
     int currentScene;
 
@@ -23,7 +26,7 @@ public class SceneManager {
             scanner = new Scanner(new FileInputStream(scenesList));
             while (scanner.hasNextLine()) {
                 try {
-                    getScene(scanner.nextLine());
+                    sceneFileNames.add(scanner.nextLine());
                 }
                 catch (Exception e) {
                     e.printStackTrace();
@@ -50,17 +53,29 @@ public class SceneManager {
         }
     }
 
-    private void getScene(String fileName) throws Exception {
+    private Scene getScene(String fileName) throws Exception {
         if(!extensionFilter.accept(null, fileName)) {
             throw new Exception();
         }
         File sceneFile = new File("./src/" + fileName);
-        scenes.add(new Scene(sceneFile));
+        return new Scene(sceneFile);
     }
 
     public void loadScene(int i) {
         currentScene = i;
-        GameObject.gameObjects = scenes.get(i).gameObjects;
+        if(GameObject.gameObjects != null) {
+            Platform.runLater(() -> RenderSystem.renderSystem.visibleObjects.getChildren().clear());
+        }
+        Scene scene = null;
+        try {
+            scene = getScene(sceneFileNames.get(i));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        GameObject.gameObjects = scene.gameObjects;
+        GameObject.addedGameObjects = scene.addedGameObjects;
+        GameObject.removedGameObjects = scene.removedGameObjects;
+        RenderSystem.renderSystem.setBackground(Color.GRAY);
     }
 
     private static class ExtensionFilter implements FilenameFilter {

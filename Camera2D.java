@@ -8,9 +8,6 @@ public class Camera2D extends Component {
 
     public Camera2D() {
         orthographicWidth = 10;
-        if(main == null)  {
-            main = this;
-        }
         orthographicSize = new Vector2D(orthographicWidth,
                 orthographicWidth * RenderSystem.renderSystem.getScreenRatio());
     }
@@ -20,6 +17,10 @@ public class Camera2D extends Component {
         this.orthographicWidth = orthographicWidth;
         orthographicSize = new Vector2D(orthographicWidth,
                 orthographicWidth * RenderSystem.renderSystem.getScreenRatio());
+    }
+
+    public static Camera2D getMain() {
+        return main;
     }
 
     public void setOrthographicWidth(float orthographicWidth) {
@@ -40,10 +41,8 @@ public class Camera2D extends Component {
     public Vector2D worldSpaceToScreen(GameObject gameObject) {
         Vector2D globalPosition, leftUpVert;
         if(gameObject.getComponent(UITransform2D.class) != null) {
-            leftUpVert = Vector2D.sub(gameObject.getComponent(Transform2D.class).getGlobalPosition(),
-                    Vector2D.div(gameObject.getComponent(Transform2D.class).getGlobalScale(), 2));
             return Vector2D.vector2Dmul(
-                    leftUpVert,
+                    gameObject.getComponent(Transform2D.class).getGlobalPosition(),
                     RenderSystem.renderSystem.windowSize
             );
         }
@@ -69,6 +68,10 @@ public class Camera2D extends Component {
     }
 
     public Vector2D worldScaleToScreen(GameObject gameObject) {
+        if(gameObject.getComponent(UITransform2D.class) != null) {
+            return Vector2D.mul(gameObject.getComponent(Transform2D.class).getGlobalScale(),
+                    RenderSystem.renderSystem.windowSize.x);
+        }
         return Vector2D.vector2Dmul(Vector2D.vector2Ddiv(gameObject.getComponent(Transform2D.class).getGlobalScale(),
                 orthographicSize), RenderSystem.renderSystem.windowSize);
     }

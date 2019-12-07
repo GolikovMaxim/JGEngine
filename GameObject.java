@@ -1,23 +1,28 @@
 package JGEngine;
 
 import javafx.application.Platform;
-import org.ietf.jgss.GSSManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 public class GameObject {
-    static ArrayList<GameObject> gameObjects;
-    static ArrayList<GameObject> addedGameObjects = new ArrayList<>();
-    static ArrayList<GameObject> removedGameObjects = new ArrayList<>();
-    static final GameObject worldCenter = gameObject2D("WorldCenter");
+    static ArrayList<GameObject> gameObjects = null;
+    static ArrayList<GameObject> addedGameObjects = null;
+    static ArrayList<GameObject> removedGameObjects = null;
+    static final GameObject worldCenter = new GameObject();
 
     HashMap<Class, Component> components = new HashMap<>();
     HashMap<Class, Component> addedComponents = new HashMap<>();
     GameObject parent;
     ArrayList<GameObject> children = new ArrayList<>();
     public String name;
+    boolean isActive = true;
+
+    GameObject() {
+        this.parent = this;
+        addComponent(new Transform2D());
+    }
 
     GameObject(String name) {
         this.parent = worldCenter;
@@ -35,6 +40,24 @@ public class GameObject {
     public static GameObject gameObject2D(String name, Vector2D pos) {
         GameObject res = new GameObject(name);
         res.addComponent(new Transform2D(pos));
+        res.processAddedComponents();
+        return res;
+    }
+
+    public static GameObject UIGameObject2D(String name) {
+        GameObject res = new GameObject(name);
+        UITransform2D uit = new UITransform2D();
+        res.addComponent(uit);
+        res.components.put(Transform2D.class, uit);
+        res.processAddedComponents();
+        return res;
+    }
+
+    public static GameObject UIGameObject2D(String name, Vector2D pos) {
+        GameObject res = new GameObject(name);
+        UITransform2D uit = new UITransform2D(pos);
+        res.addComponent(uit);
+        res.components.put(Transform2D.class, uit);
         res.processAddedComponents();
         return res;
     }
@@ -103,6 +126,13 @@ public class GameObject {
 
     public void delete() {
         removedGameObjects.add(this);
+    }
+
+    public void setActive(boolean active) {
+        if(getComponent(Renderer2D.class) != null) {
+            getComponent(Renderer2D.class).setRender(active);
+        }
+        isActive = active;
     }
 
     public static GameObject findGameObject(String name) {

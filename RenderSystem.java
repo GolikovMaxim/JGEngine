@@ -5,6 +5,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.SceneAntialiasing;
 import javafx.scene.image.ImageView;
+import javafx.scene.paint.Paint;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,6 +18,7 @@ public class RenderSystem {
     ArrayList<GameObject> uiGameObjects = new ArrayList<>();
     Vector2D windowSize = new Vector2D(640, 480);
     Group visibleObjects = new Group();
+    ArrayList<Runnable> renderings = new ArrayList<>();
     Scene scene;
 
     private RenderSystem() {
@@ -24,7 +26,15 @@ public class RenderSystem {
     }
 
     void render() {
-        if(Camera2D.main == null) {
+        Platform.runLater(() -> {
+            synchronized (renderings) {
+                for (Runnable runnable : renderings) {
+                    runnable.run();
+                }
+                renderings.clear();
+            }
+        });
+        /*if(Camera2D.main == null) {
             return;
         }
         synchronized (GameObject.gameObjects) {
@@ -65,10 +75,7 @@ public class RenderSystem {
                 renderView.setRotate(-rotation * Mathf.radian);
                 renderView.setTranslateZ(entry.getKey().getComponent(Transform2D.class).zFactor);
             }
-        }
-        synchronized (Engine.engine) {
-            Engine.engine.notify();
-        }
+        }*/
     }
 
     public float getScreenRatio() {
@@ -87,5 +94,9 @@ public class RenderSystem {
 
     public void setWindowTitle(String title) {
         Platform.runLater(() -> Main.stage.setTitle(title));
+    }
+
+    public void setBackground(Paint color) {
+        Platform.runLater(() -> scene.setFill(color));
     }
 }

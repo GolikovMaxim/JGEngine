@@ -42,6 +42,10 @@ public class Transform2D extends Component {
         rotation = (angle % 360 + 360) % 360;
     }
 
+    public float getRotation() {
+        return rotation;
+    }
+
     public Vector2D getGlobalPosition() {
         if(gameObject == GameObject.worldCenter) {
             return position;

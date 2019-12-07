@@ -74,6 +74,14 @@ public class Vector2D {
         return new Vector2D((int)x, (int)y);
     }
 
+    public Vector2D clip(float x, float y) {
+        return new Vector2D((this.x % x + x) % x, (this.y % y + y) % y);
+    }
+
+    public Vector2D clip(Vector2D v) {
+        return clip(v.x, v.y);
+    }
+
     public float length() {
         return (float)Math.sqrt(x*x + y*y);
     }
