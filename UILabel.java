@@ -5,10 +5,10 @@ import javafx.scene.control.Label;
 import javafx.scene.text.Font;
 
 public class UILabel extends Component {
-    String text;
+    Label label;
 
     public UILabel(String text) {
-        this.text = text;
+        this.label = new Label(text);
     }
 
     @Override
@@ -16,17 +16,14 @@ public class UILabel extends Component {
         if(gameObject.getComponent(Renderer2D.class) == null) {
             gameObject.addComponent(new Renderer2D());
         }
-        gameObject.getComponent(Renderer2D.class).uiText = new Label(text);
+        gameObject.getComponent(Renderer2D.class).uiText = label;
     }
 
     public void setTextFont(Font font) {
-        gameObject.getComponent(Renderer2D.class).uiText.setFont(font);
+        Platform.runLater(() -> label.setFont(font));
     }
 
     public void setText(String text) {
-        this.text = text;
-        Platform.runLater(() -> {
-            gameObject.getComponent(Renderer2D.class).uiText.setText(text);
-        });
+        Platform.runLater(() -> label.setText(text));
     }
 }

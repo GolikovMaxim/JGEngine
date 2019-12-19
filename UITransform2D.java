@@ -10,16 +10,4 @@ public class UITransform2D extends Transform2D {
         this();
         position = pos;
     }
-
-    public Vector2D getGlobalPosition() {
-        return position;
-    }
-
-    public float getGlobalRotation() {
-        return rotation;
-    }
-
-    public Vector2D getGlobalScale() {
-        return scale;
-    }
 }

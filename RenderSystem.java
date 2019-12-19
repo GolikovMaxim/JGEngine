@@ -8,8 +8,8 @@ import javafx.scene.image.ImageView;
 import javafx.scene.paint.Paint;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.HashMap;
-import java.util.Map;
 
 public class RenderSystem {
     public static final RenderSystem renderSystem = new RenderSystem();
@@ -18,7 +18,7 @@ public class RenderSystem {
     ArrayList<GameObject> uiGameObjects = new ArrayList<>();
     Vector2D windowSize = new Vector2D(640, 480);
     Group visibleObjects = new Group();
-    ArrayList<Runnable> renderings = new ArrayList<>();
+    final ArrayList<Runnable> renderings = new ArrayList<>();
     Scene scene;
 
     private RenderSystem() {
@@ -28,54 +28,17 @@ public class RenderSystem {
     void render() {
         Platform.runLater(() -> {
             synchronized (renderings) {
-                for (Runnable runnable : renderings) {
-                    runnable.run();
+                try {
+                    for (Runnable runnable : renderings) {
+                        runnable.run();
+                    }
+                }
+                catch (ConcurrentModificationException ignored) {
+
                 }
                 renderings.clear();
             }
         });
-        /*if(Camera2D.main == null) {
-            return;
-        }
-        synchronized (GameObject.gameObjects) {
-            for(GameObject gameObject : GameObject.gameObjects) {
-                if(Camera2D.main.isVisible(gameObject) && gameObject.getComponent(Renderer2D.class) != null) {
-                    if(renderGameObjects.get(gameObject) != null && !renderGameObjects.get(gameObject)) {
-                        visibleObjects.getChildren().add(gameObject.getComponent(Renderer2D.class).imageView);
-                        for(Map.Entry<Class, Component> entry : gameObject.components.entrySet()) {
-                            entry.getValue().onBecomeVisible();
-                        }
-                    }
-                    renderGameObjects.replace(gameObject, true);
-                }
-                else {
-                    if(renderGameObjects.get(gameObject) != null && renderGameObjects.get(gameObject)) {
-                        visibleObjects.getChildren().remove(gameObject.getComponent(Renderer2D.class).imageView);
-                        for(Map.Entry<Class, Component> entry : gameObject.components.entrySet()) {
-                            entry.getValue().onBecomeInvisible();
-                        }
-                    }
-                    renderGameObjects.replace(gameObject, false);
-                }
-            }
-        }
-        for(Map.Entry<GameObject, Boolean> entry : renderGameObjects.entrySet()) {
-            if(entry.getValue() && entry.getKey().getComponent(Renderer2D.class) != null) {
-                ImageView renderView = entry.getKey().getComponent(Renderer2D.class).imageView;
-                if(renderView == null) {
-                    continue;
-                }
-                Vector2D position = Camera2D.main.worldSpaceToScreen(entry.getKey());
-                float rotation = Camera2D.main.worldRotationToScreen(entry.getKey());
-                Vector2D scale = Camera2D.main.worldScaleToScreen(entry.getKey());
-                renderView.setX(position.x - scale.x / 2);
-                renderView.setY(position.y - scale.y / 2);
-                renderView.setFitWidth(scale.x);
-                renderView.setFitHeight(scale.y);
-                renderView.setRotate(-rotation * Mathf.radian);
-                renderView.setTranslateZ(entry.getKey().getComponent(Transform2D.class).zFactor);
-            }
-        }*/
     }
 
     public float getScreenRatio() {

@@ -16,4 +16,13 @@ public class UIImage extends Component {
         }
         gameObject.getComponent(Renderer2D.class).setImage(image);
     }
+
+    public Image getImage() {
+        return image;
+    }
+
+    public void setImage(Image image) {
+        this.image = image;
+        gameObject.getComponent(Renderer2D.class).setImage(image);
+    }
 }

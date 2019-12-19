@@ -93,6 +93,9 @@ public class Vector2D {
 
     @Override
     public boolean equals(Object obj) {
+        if(obj == null) {
+            return false;
+        }
         if(obj.getClass().equals(getClass())) {
             return x == ((Vector2D)obj).x && y == ((Vector2D)obj).y;
         }

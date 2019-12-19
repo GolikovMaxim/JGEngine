@@ -8,6 +8,7 @@ import javafx.scene.text.Font;
 
 public class UIButton extends Component {
     Image idle, active;
+    Label label;
     Runnable onClick;
     boolean wasClicked = false;
     String text;
@@ -19,11 +20,22 @@ public class UIButton extends Component {
         this.active = active;
         this.onClick = onClick;
         this.text = text;
+        label = new Label(text);
     }
 
     @Override
     public void onStart() {
-       initialize();
+        if(gameObject.getComponent(Renderer2D.class) == null) {
+            gameObject.addComponent(new Renderer2D(idle));
+        }
+        else {
+            gameObject.getComponent(Renderer2D.class).setImage(idle);
+        }
+        gameObject.getComponent(Renderer2D.class).uiText = label;
+        label.setAlignment(Pos.CENTER);
+        label.setOnMouseClicked(event -> wasClicked = true);
+        label.setOnMouseEntered(event -> gameObject.getComponent(Renderer2D.class).setImage(active));
+        label.setOnMouseExited(event -> gameObject.getComponent(Renderer2D.class).setImage(idle));
     }
 
     @Override
@@ -34,26 +46,11 @@ public class UIButton extends Component {
         }
     }
 
-    public void initialize() {
-        if(gameObject.getComponent(Renderer2D.class) == null) {
-            gameObject.addComponent(new Renderer2D(idle));
-        }
-        else {
-            gameObject.getComponent(Renderer2D.class).setImage(idle);
-        }
-        gameObject.getComponent(Renderer2D.class).uiText = new Label(text);
-        gameObject.getComponent(Renderer2D.class).uiText.setAlignment(Pos.CENTER);
-        gameObject.getComponent(Renderer2D.class).uiText.setOnMouseClicked(event -> wasClicked = true);
-        gameObject.getComponent(Renderer2D.class).uiText.setOnMouseEntered(event -> gameObject.getComponent(Renderer2D.class).setImage(active));
-        gameObject.getComponent(Renderer2D.class).uiText.setOnMouseExited(event -> gameObject.getComponent(Renderer2D.class).setImage(idle));
-        isStarted = true;
-    }
-
     public void setTextFont(Font font) {
-        gameObject.getComponent(Renderer2D.class).uiText.setFont(font);
+        label.setFont(font);
     }
 
     public void setTextColor(Paint color) {
-        gameObject.getComponent(Renderer2D.class).uiText.setTextFill(color);
+        label.setTextFill(color);
     }
 }

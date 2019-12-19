@@ -153,11 +153,8 @@ public class GameObject {
 
     static void processRemovedGameObjects() {
         for(GameObject gameObject : removedGameObjects) {
-            if(gameObject.components.containsKey(Renderer2D.class)) {
-                Platform.runLater(() ->
-                        RenderSystem.renderSystem.visibleObjects.getChildren().
-                                remove(gameObject.getComponent(Renderer2D.class).imageView)
-                );
+            for(Map.Entry<Class, Component> component : gameObject.components.entrySet()) {
+                component.getValue().onDestroy();
             }
             gameObjects.remove(gameObject);
         }

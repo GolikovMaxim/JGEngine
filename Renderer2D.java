@@ -1,7 +1,8 @@
 package JGEngine;
 
 import javafx.application.Platform;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
+import javafx.scene.effect.Effect;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
@@ -10,6 +11,10 @@ import java.util.Map;
 public class Renderer2D extends Component {
     ImageView imageView;
     Label uiText = null;
+    TextField field = null;
+    ListView scrollPane = null;
+    ComboBox comboBox = null;
+
     boolean isVisible = false;
     boolean render = true;
 
@@ -25,13 +30,25 @@ public class Renderer2D extends Component {
         imageView.setImage(renderLook);
     }
 
+    public void setImageEffect(Effect effect) {
+        imageView.setEffect(effect);
+    }
+
     public Image getImage() {
         return imageView.getImage();
     }
 
+    public void setField(TextField field) {
+        this.field = field;
+    }
+
+    public void setListView(ListView scrollPane) {
+        this.scrollPane = scrollPane;
+    }
+
     @Override
     public void onStart() {
-        RenderSystem.renderSystem.renderGameObjects.put(gameObject, false);
+
     }
 
     @Override
@@ -48,6 +65,15 @@ public class Renderer2D extends Component {
                             RenderSystem.renderSystem.visibleObjects.getChildren().add(imageView);
                             if(uiText != null) {
                                 RenderSystem.renderSystem.visibleObjects.getChildren().add(uiText);
+                            }
+                            if(field != null) {
+                                RenderSystem.renderSystem.visibleObjects.getChildren().add(field);
+                            }
+                            if(comboBox != null) {
+                                RenderSystem.renderSystem.visibleObjects.getChildren().add(comboBox);
+                            }
+                            if(scrollPane != null) {
+                                RenderSystem.renderSystem.visibleObjects.getChildren().add(scrollPane);
                             }
                         }
                         Vector2D position = Camera2D.main.worldSpaceToScreen(gameObject);
@@ -67,6 +93,30 @@ public class Renderer2D extends Component {
                             uiText.setRotate(-rotation * Mathf.radian);
                             uiText.setTranslateZ(gameObject.getComponent(Transform2D.class).zFactor - 1);
                         }
+                        if(field != null) {
+                            field.setLayoutX(position.x - scale.x / 2);
+                            field.setLayoutY(position.y - scale.y / 2);
+                            field.setPrefWidth(scale.x);
+                            field.setPrefHeight(scale.y);
+                            field.setRotate(-rotation * Mathf.radian);
+                            field.setTranslateZ(gameObject.getComponent(Transform2D.class).zFactor - 1);
+                        }
+                        if(scrollPane != null) {
+                            scrollPane.setLayoutX(position.x - scale.x / 2);
+                            scrollPane.setLayoutY(position.y - scale.y / 2);
+                            scrollPane.setPrefWidth(scale.x);
+                            scrollPane.setPrefHeight(scale.y);
+                            scrollPane.setRotate(-rotation * Mathf.radian);
+                            scrollPane.setTranslateZ(gameObject.getComponent(Transform2D.class).zFactor - 1);
+                        }
+                        if(comboBox != null) {
+                            comboBox.setLayoutX(position.x - scale.x / 2);
+                            comboBox.setLayoutY(position.y - scale.y / 2);
+                            comboBox.setPrefWidth(scale.x);
+                            comboBox.setPrefHeight(scale.y);
+                            comboBox.setRotate(-rotation * Mathf.radian);
+                            comboBox.setTranslateZ(gameObject.getComponent(Transform2D.class).zFactor - 1);
+                        }
                     }
                     else {
                         if(isVisible) {
@@ -74,10 +124,7 @@ public class Renderer2D extends Component {
                             for(Map.Entry<Class, Component> entry : gameObject.components.entrySet()) {
                                 entry.getValue().onBecomeInvisible();
                             }
-                            RenderSystem.renderSystem.visibleObjects.getChildren().remove(imageView);
-                            if(uiText != null) {
-                                RenderSystem.renderSystem.visibleObjects.getChildren().remove(uiText);
-                            }
+                            deleteRenders();
                         }
                     }
                 }
@@ -85,20 +132,31 @@ public class Renderer2D extends Component {
         }
     }
 
+    private void deleteRenders() {
+        RenderSystem.renderSystem.visibleObjects.getChildren().remove(imageView);
+        if(uiText != null) {
+            RenderSystem.renderSystem.visibleObjects.getChildren().remove(uiText);
+        }
+        if(field != null) {
+            RenderSystem.renderSystem.visibleObjects.getChildren().remove(field);
+        }
+        if(scrollPane != null) {
+            RenderSystem.renderSystem.visibleObjects.getChildren().remove(scrollPane);
+        }
+        if(comboBox != null) {
+            RenderSystem.renderSystem.visibleObjects.getChildren().remove(comboBox);
+        }
+    }
+
     public void setRender(boolean _render) {
         if(render && !_render) {
-            Platform.runLater(() -> {
-                RenderSystem.renderSystem.visibleObjects.getChildren().remove(imageView);
-                if(uiText != null) {
-                    RenderSystem.renderSystem.visibleObjects.getChildren().remove(uiText);
-                }
-            });
+            Platform.runLater(this::deleteRenders);
         }
         render = _render;
     }
 
     @Override
     public void onDestroy() {
-        RenderSystem.renderSystem.renderGameObjects.remove(gameObject);
+        setRender(false);
     }
 }

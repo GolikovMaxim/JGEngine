@@ -64,7 +64,10 @@ public class SceneManager {
     public void loadScene(int i) {
         currentScene = i;
         if(GameObject.gameObjects != null) {
-            Platform.runLater(() -> RenderSystem.renderSystem.visibleObjects.getChildren().clear());
+            for(GameObject gameObject : GameObject.gameObjects) {
+                gameObject.delete();
+            }
+            GameObject.processRemovedGameObjects();
         }
         Scene scene = null;
         try {

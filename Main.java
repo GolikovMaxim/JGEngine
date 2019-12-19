@@ -19,6 +19,7 @@ public class Main extends Application {
         Engine.engine = new Engine();
         Main.stage.setScene(RenderSystem.renderSystem.scene);
         Main.stage.show();
+        Main.stage.setResizable(false);
         Main.stage.setOnCloseRequest(event -> {
             System.exit(0);
         });

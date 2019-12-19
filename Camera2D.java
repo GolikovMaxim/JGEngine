@@ -40,13 +40,15 @@ public class Camera2D extends Component {
 
     public Vector2D worldSpaceToScreen(GameObject gameObject) {
         Vector2D globalPosition, leftUpVert;
+        globalPosition = gameObject.getComponent(Transform2D.class).getGlobalPosition();
         if(gameObject.getComponent(UITransform2D.class) != null) {
+            leftUpVert = Vector2D.sub(gameObject.getComponent(Transform2D.class).getGlobalPosition(),
+                    Vector2D.div(gameObject.getComponent(Transform2D.class).getGlobalScale(), 2));
             return Vector2D.vector2Dmul(
-                    gameObject.getComponent(Transform2D.class).getGlobalPosition(),
+                    globalPosition,
                     RenderSystem.renderSystem.windowSize
             );
         }
-        globalPosition = gameObject.getComponent(Transform2D.class).getGlobalPosition();
         Rect2D cameraRect = new Rect2D(this);
         Rect2D notRotated = new Rect2D(cameraRect.position, cameraRect.size, 0);
         globalPosition.rotateAround(notRotated.position, -cameraRect.rotation);

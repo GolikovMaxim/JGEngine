@@ -50,21 +50,21 @@ public class Transform2D extends Component {
         if(gameObject == GameObject.worldCenter) {
             return position;
         }
-        return Vector2D.add(position, gameObject.parent.getComponent(Transform2D.class).position);
+        return Vector2D.add(position, gameObject.parent.getComponent(Transform2D.class).getGlobalPosition());
     }
 
     public float getGlobalRotation() {
         if(gameObject == GameObject.worldCenter) {
             return rotation;
         }
-        return rotation + gameObject.parent.getComponent(Transform2D.class).rotation;
+        return rotation + gameObject.parent.getComponent(Transform2D.class).getGlobalRotation();
     }
 
     public Vector2D getGlobalScale() {
         if(gameObject == GameObject.worldCenter) {
             return scale;
         }
-        return Vector2D.vector2Dmul(scale, gameObject.parent.getComponent(Transform2D.class).scale);
+        return Vector2D.vector2Dmul(scale, gameObject.parent.getComponent(Transform2D.class).getGlobalScale());
     }
 
     public void setGlobalPosition(Vector2D vec) {
